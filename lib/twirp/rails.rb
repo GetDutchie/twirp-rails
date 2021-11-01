@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require "twirp/rails/configuration"
-require "twirp/rails/helpers"
+require "twirp/rails/helpers/hooks"
+require "twirp/rails/helpers/services"
 require "twirp/rails/routes"
 require "twirp/rails/engine"
 require "twirp/rails/version"
@@ -22,8 +23,20 @@ module Twirp
         @services ||= []
       end
 
+      def hooks
+        @hooks ||= {}
+      end
+
       def load_handlers
-        Dir[File.join(configuration.handlers_path.to_s, '**', '*.rb')].each { |f| require f }
+        configuration.handlers_paths.each do |handlers_path|
+          Dir[File.join(handlers_path.to_s, '**', '*.rb')].sort.each { |f| require f }
+        end
+      end
+
+      def load_hooks
+        configuration.hooks_paths.each do |hooks_path|
+          Dir[File.join(hooks_path.to_s, '**', '*.rb')].sort.each { |f| require f }
+        end
       end
     end
   end

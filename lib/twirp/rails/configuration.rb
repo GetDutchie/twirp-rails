@@ -3,14 +3,19 @@
 module Twirp
   module Rails
     class Configuration
-      attr_reader :handlers_path
+      attr_reader :handlers_paths, :hooks_paths
 
       def initialize
-        @handlers_path = nil
+        @handlers_paths = []
+        @hooks_paths = []
       end
 
-      def handlers_path=(v)
-        @handlers_path = v.to_s
+      def add_handlers_path(path)
+        @handlers_paths << path.to_s
+      end
+
+      def add_hooks_path(path)
+        @hooks_paths << path.to_s
       end
     end
   end

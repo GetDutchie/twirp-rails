@@ -4,9 +4,9 @@ module Twirp
   module Rails
     class Routes # :nodoc:
       module Helper
-        def use_twirp(options = {})
+        def use_twirp(namespace, options = {})
           services = Twirp::Rails.services
-          Twirp::Rails::Routes.new(self, services).generate_routes!(options)
+          Twirp::Rails::Routes.new(self, services).generate_routes!(namespace, options)
         end
       end
 
@@ -33,9 +33,11 @@ module Twirp
         @services = services
       end
 
-      def generate_routes!(options)
+      def generate_routes!(namespace, options)
         routes.scope options[:scope] || 'twirp' do
-          @services.each do |service|
+          @services.each do |service, bind_namespace, _context|
+            next unless namespace.to_sym == bind_namespace
+
             service.extend Inspectable
             service.class.rpcs.values.each do |h|
               rpc_method = h[:rpc_method]

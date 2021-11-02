@@ -6,12 +6,12 @@ require "twirp/rails/version"
 Gem::Specification.new do |spec|
   spec.name          = "twirp-rails"
   spec.version       = Twirp::Rails::VERSION
-  spec.authors       = ["Nobuhiro Nikushi"]
-  spec.email         = ["deneb.ge@gmail.com"]
+  spec.authors       = ["Dutchie Engineers"]
+  spec.email         = ["engineering@dutchie.com"]
 
-  spec.summary       = "Twirp for Rails"
+  spec.summary       = "Twirp for Rails with Engine support"
   spec.description   = spec.summary
-  spec.homepage      = "https://github.com/nikushi/twirp-rails"
+  spec.homepage      = "https://github.com/GetDutchie/twirp-rails"
   spec.license       = "MIT"
 
   # Specify which files should be added to the gem when it is released.

@@ -3,7 +3,9 @@
 require_relative 'service_twirp'
 
 class HelloWorldHandler
-  include Twirp::Rails::Helpers
+  include Twirp::Rails::Helpers::Services
+
+  twirp_namespace :test
 
   bind Example::HelloWorld::HelloWorldService
 

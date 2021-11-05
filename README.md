@@ -103,29 +103,26 @@ class AuthenticationHook
   # Registers the hook at a namespace with a key
   register_hook :some_namespace, :authentication
 
-  # Service is passed to an attach method
-  def self.attach(service)
-    # Typical Twirp service hooks
-    svc.before do |rack_env, env|
-      env[:user_id] = authenticate(rack_env)
-      env[:enviornment] = (ENV['ENVIRONMENT'] || :local).to_sym
-    end
+  # Typical Twirp service hook methods
+  def before(rack_env, env)
+    env[:user_id] = authenticate(rack_env)
+    env[:enviornment] = (ENV['ENVIRONMENT'] || :local).to_sym
+  end
 
-    svc.on_success do |env|
-      Stats.inc("requests.success")
-    end
+  def on_success(env)
+    Stats.inc("requests.success")
+  end
 
-    svc.on_error do |twerr, env|
-      Stats.inc("requests.error.#{twerr.code}")
-    end
+  def on_error(twerr, env)
+    Stats.inc("requests.error.#{twerr.code}")
+  end
 
-    svc.exception_raised do |e, env|
-      if env[:environment] == :local
-        puts "[Exception] #{e}"
-        puts e.backtrace.join("\n")
-      else
-        ExceptionTracker.send(e)
-      end
+  def exception_raised(e, env)
+    if env[:environment] == :local
+      puts "[Exception] #{e}"
+      puts e.backtrace.join("\n")
+    else
+      ExceptionTracker.send(e)
     end
   end
 end

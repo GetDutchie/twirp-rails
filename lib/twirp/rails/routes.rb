@@ -28,6 +28,19 @@ module Twirp
 
       attr_reader :routes
 
+      def self.on_create_service(&block)
+        Twirp::Rails.global_service_hooks ||= []
+        Twirp::Rails.global_service_hooks << block
+      end
+
+      def self.run_create_hooks(service)
+        return unless Twirp::Rails.global_service_hooks.present?
+
+        Twirp::Rails.global_service_hooks.each do |hook|
+          hook.call service
+        end
+      end
+
       def initialize(routes, services)
         @routes = routes
         @services = services
@@ -39,6 +52,7 @@ module Twirp
             next unless namespace.to_sym == bind_namespace
 
             service.extend Inspectable
+            self.class.run_create_hooks service
             service.class.rpcs.values.each do |h|
               rpc_method = h[:rpc_method]
               path = service.full_name + '/' + rpc_method.to_s

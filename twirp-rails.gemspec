@@ -25,7 +25,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "railties", ">= 4.2"
   spec.add_dependency 'twirp'
-  spec.add_dependency 'lograge'
 
   spec.add_development_dependency "bundler", "~> 2.0"
   spec.add_development_dependency "rake", "~> 10.0"

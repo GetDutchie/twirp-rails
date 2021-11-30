@@ -1,8 +1,9 @@
 # frozen_string_literal: true
-
+require "twirp/rails/rails_ext/rack/logger"
 require "twirp/rails/configuration"
-require 'twirp/rails/logging_adapter'
-require 'twirp/rails/log_subscriber'
+require "twirp/rails/logging/formatters/key_value"
+require 'twirp/rails/logging/adapter'
+require 'twirp/rails/logging/subscriber'
 require "twirp/rails/helpers/hooks"
 require "twirp/rails/helpers/services"
 require "twirp/rails/routes"
@@ -47,10 +48,10 @@ module Twirp
       end
 
       def log_twirp_calls!(&log_writer)
-        Twirp::Rails::LoggingAdapter.install
+        Twirp::Rails::Logging::Adapter.install
 
-        Twirp::Rails::LogSubscriber.log_writer = log_writer if block_given?
-        Twirp::Rails::LogSubscriber.attach_to(:twirp)
+        Twirp::Rails::Logging::Subscriber.log_writer = log_writer if block_given?
+        Twirp::Rails::Logging::Subscriber.attach_to(:twirp)
       end
 
       def load_handlers

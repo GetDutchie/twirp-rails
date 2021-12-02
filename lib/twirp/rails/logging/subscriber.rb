@@ -16,10 +16,8 @@ module Twirp
 
         def default_log_writer(event)
           twirp_call_info = {
-            "service" => event.payload[:env][:service].try(:full_name),
-            "method" => event.payload[:env][:rpc_method],
-            "path" => event.payload[:rack_env]["REQUEST_PATH"],
-            "duration" => event.duration
+            **status_info(event),
+            **base_log_info(event)
           }
 
           twirp_call_info[:params] = event.payload[:env][:input].to_h if Twirp::Rails.configuration.logging.log_params

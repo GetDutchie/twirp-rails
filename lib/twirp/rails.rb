@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 require "twirp/rails/rails_ext/rack/logger"
-require "twirp/rails/configuration"
+require "twirp/rails/logging/formatters/json"
 require "twirp/rails/logging/formatters/key_value"
+require "twirp/rails/configurations/logging"
+require "twirp/rails/configuration"
 require 'twirp/rails/logging/adapter'
 require 'twirp/rails/logging/subscriber'
 require "twirp/rails/helpers/hooks"
@@ -24,9 +26,9 @@ module Twirp
       end
 
       def setup
-        if configuration.log_twirp_calls
-          if configuration.log_twirp_calls.is_a?(Proc)
-            log_twirp_calls!(&configuration.log_twirp_calls)
+        if configuration.logging.log_twirp_calls
+          if configuration.logging.log_twirp_calls.is_a?(Proc)
+            log_twirp_calls!(&configuration.logging.log_twirp_calls)
           else
             log_twirp_calls!
           end

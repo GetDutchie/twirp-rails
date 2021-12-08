@@ -6,6 +6,7 @@ require "twirp/rails/configurations/logging"
 require "twirp/rails/configuration"
 require 'twirp/rails/logging/adapter'
 require 'twirp/rails/logging/subscriber'
+require "twirp/rails/service_wrapper"
 require "twirp/rails/helpers/hooks"
 require "twirp/rails/helpers/services"
 require "twirp/rails/routes"

@@ -36,7 +36,7 @@ module Twirp
               )
             end
 
-            service = service_klass.new(new)
+            service_wrapper = Twirp::Rails::ServiceWrapper.new(service_klass.new(new))
 
             hooks = base_hooks + hooks
 
@@ -45,10 +45,10 @@ module Twirp
               if hook_klass.nil?
                 raise ArgumentError.new("Unknown hook #{hook} for #{namespace} namespace")
               end
-              hook_klass.attach(service)
+              hook_klass.attach(service_wrapper.service)
             end
 
-            Twirp::Rails.services << [service, namespace, context]
+            Twirp::Rails.services << [service_wrapper, namespace, context]
           end
         end
       end

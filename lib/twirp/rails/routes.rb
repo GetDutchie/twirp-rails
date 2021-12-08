@@ -33,11 +33,11 @@ module Twirp
         Twirp::Rails.global_service_hooks << block
       end
 
-      def self.run_create_hooks(service)
+      def self.run_create_hooks(service_wrapper)
         return unless Twirp::Rails.global_service_hooks.present?
 
         Twirp::Rails.global_service_hooks.each do |hook|
-          hook.call service
+          hook.call service_wrapper
         end
       end
 
@@ -48,15 +48,17 @@ module Twirp
 
       def generate_routes!(namespace, options)
         routes.scope options[:scope] || 'twirp' do
-          @services.each do |service, bind_namespace, _context|
+          @services.each do |service_wrapper, bind_namespace, _context|
             next unless namespace.to_sym == bind_namespace
 
+            service = service_wrapper.service
+
             service.extend Inspectable
-            self.class.run_create_hooks service
+            self.class.run_create_hooks service_wrapper
             service.class.rpcs.values.each do |h|
               rpc_method = h[:rpc_method]
               path = service.full_name + '/' + rpc_method.to_s
-              @routes.match path, to: service, format: false, via: :all
+              @routes.match path, to: service_wrapper, format: false, via: :all
             end
           end
 

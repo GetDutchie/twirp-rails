@@ -11,20 +11,11 @@ module Twirp
           key_value: Twirp::Rails::Logging::Formatters::KeyValue
         }.freeze
 
-        def log_twirp_calls
-          @log_twirp_calls ||= true
-        end
-
-        def log_exceptions
-          @log_exceptions ||= false
-        end
-
-        def log_params
-          @log_params ||= false
-        end
-
-        def log_formatter
-          @log_formatter ||= LOG_FORMATTERS[:key_value].new
+        def initialize
+          @log_twirp_calls = true
+          @log_exceptions = false
+          @log_params = false
+          @log_formatter = LOG_FORMATTERS[:key_value].new
         end
 
         def log_formatter=(format)

@@ -4,7 +4,7 @@ module Twirp
   module Rails
     module Configurations
       class Logging
-        attr_accessor :log_twirp_calls, :log_exceptions, :log_params
+        attr_accessor :log_twirp_calls, :log_exceptions, :log_params, :log_formatter
 
         LOG_FORMATTERS = {
           json: Twirp::Rails::Logging::Formatters::Json,

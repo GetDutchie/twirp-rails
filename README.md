@@ -100,9 +100,6 @@ Twirp Service Hooks can be defined like this:
 class AuthenticationHook
   include Twirp::Rails::Helpers::Hooks
 
-  # Registers the hook at a namespace with a key
-  register_hook :some_namespace, :authentication
-
   # Typical Twirp service hook methods
   def before(rack_env, env)
     env[:user_id] = authenticate(rack_env)
@@ -136,7 +133,7 @@ Via a parent class:
 class ApplicationHandler
   include Twirp::Rails::Helpers::Services
 
-  twirp_hooks :authentication
+  bind_hook AuthenticationHook
 end
 ```
 
@@ -148,7 +145,7 @@ Via the `bind` method as an option:
 class HelloHandler
   include Twirp::Rails::Helpers::Services
 
-  bind HelloService, hooks: [:authentication]
+  bind HelloService, hooks: [AuthenticationHook]
 
   def greet(_req, _env)
     HelloResponse.new(message: 'hello')

@@ -15,7 +15,7 @@ module Twirp
             @base_namespace = namespace.to_sym
           end
 
-          def register_hook(hook_klass, **options)
+          def bind_hook(hook_klass, **options)
             @base_hooks = base_hooks.push({hook_klass: hook_klass, options: options})
           end
 

@@ -49,7 +49,6 @@ module Twirp
       def generate_routes!(mount_namespace, options)
         routes.scope options[:scope] || 'twirp' do
           @services.each do |service_wrapper:, namespace:, context: nil, hooks: []|
-            binding.pry
             next unless mount_namespace.to_sym == namespace
 
             service = service_wrapper.service
@@ -73,8 +72,7 @@ module Twirp
 
       def attach_service_hooks!(service_wrapper, hooks)
         hooks.each do |hook_klass:, options: {}|
-          binding.pry
-          hook_class.attach service_wrapper
+          hook_klass.attach service_wrapper
         end
       end
     end

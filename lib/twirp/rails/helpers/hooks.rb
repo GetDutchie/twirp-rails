@@ -10,10 +10,11 @@ module Twirp
           klass.extend ClassMethods
         end
 
-        attr_reader :service_wrapper
+        attr_reader :service_wrapper, :options
 
-        def initialize(service_wrapper, **option)
+        def initialize(service_wrapper, **options)
           @service_wrapper = service_wrapper
+          @options = options
         end
 
         module ClassMethods
@@ -49,6 +50,8 @@ module Twirp
                 hook_instance.exception_raised(e, env)
               end
             end
+
+            hook_instance
           end
         end
       end

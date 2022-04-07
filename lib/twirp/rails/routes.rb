@@ -72,7 +72,7 @@ module Twirp
 
       def attach_service_hooks!(service_wrapper, hooks)
         hooks.each do |hook_klass:, options: {}|
-          hook_klass.attach service_wrapper
+          hook_klass.attach service_wrapper, options
         end
       end
     end

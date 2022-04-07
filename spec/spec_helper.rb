@@ -1,4 +1,5 @@
 require "bundler/setup"
+require "rails"
 require "twirp/rails"
 
 require_relative 'support/hello_world/handler'

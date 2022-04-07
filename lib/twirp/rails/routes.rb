@@ -46,15 +46,16 @@ module Twirp
         @services = services
       end
 
-      def generate_routes!(namespace, options)
+      def generate_routes!(mount_namespace, options)
         routes.scope options[:scope] || 'twirp' do
-          @services.each do |service_wrapper, bind_namespace, _context|
-            next unless namespace.to_sym == bind_namespace
+          @services.each do |service_wrapper:, namespace:, context: nil, hooks: []|
+            next unless mount_namespace.to_sym == namespace
 
             service = service_wrapper.service
 
             service.extend Inspectable
             self.class.run_create_hooks service_wrapper
+            attach_service_hooks!(service_wrapper, hooks)
             service.class.rpcs.values.each do |h|
               rpc_method = h[:rpc_method]
               path = service.full_name + '/' + rpc_method.to_s
@@ -66,6 +67,12 @@ module Twirp
           null_service = ::Twirp::Service.new(CatchAllHandler.new)
           null_service.extend Inspectable
           routes.mount null_service, at: '/'
+        end
+      end
+
+      def attach_service_hooks!(service_wrapper, hooks)
+        hooks.each do |hook_klass:, options: {}|
+          hook_klass.attach service_wrapper, options
         end
       end
     end

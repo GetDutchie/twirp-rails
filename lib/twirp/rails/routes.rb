@@ -71,8 +71,8 @@ module Twirp
       end
 
       def attach_service_hooks!(service_wrapper, hooks)
-        hooks.each do |hook_klass:, options: {}|
-          hook_klass.attach service_wrapper, options
+        hooks.each do |hook_klass:, only: [], except: [], options: {}|
+          hook_klass.attach(service_wrapper, only: only, except: except, **options)
         end
       end
     end

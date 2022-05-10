@@ -42,7 +42,7 @@ module Twirp
               end
             end
 
-            hooks = hooks + all_base_hooks
+            hooks = all_base_hooks + hooks
 
             service_wrapper = Twirp::Rails::ServiceWrapper.new(service_klass.new(new))
 

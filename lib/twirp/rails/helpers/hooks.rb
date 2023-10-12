@@ -12,7 +12,7 @@ module Twirp
 
         attr_reader :service_wrapper, :options
 
-        def initialize(service_wrapper, **options)
+        def initialize(service_wrapper, options={})
           @service_wrapper = service_wrapper
           @options = options
         end
@@ -25,7 +25,7 @@ module Twirp
           end
 
           def attach(service_wrapper, only: [], except: [], **options)
-            hook_instance = self.new(service_wrapper, **options)
+            hook_instance = self.new(service_wrapper, options)
 
             unless HOOK_METHODS.any? {|method| hook_instance.respond_to?(method)}
               raise NotImplementedError.new(

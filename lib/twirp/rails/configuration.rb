@@ -3,12 +3,11 @@
 module Twirp
   module Rails
     class Configuration
-      attr_reader :handlers_paths, :hooks_paths, :logging
+      attr_accessor :handlers_paths, :hooks_paths
 
       def initialize
         @handlers_paths = []
         @hooks_paths = []
-        @logging = Twirp::Rails::Configurations::Logging.new
       end
 
       def add_handlers_path(path)

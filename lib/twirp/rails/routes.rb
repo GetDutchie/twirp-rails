@@ -4,7 +4,7 @@ module Twirp
   module Rails
     class Routes # :nodoc:
       module Helper
-        def use_twirp(namespace, options = {})
+        def use_twirp(namespace, options={})
           services = Twirp::Rails.services
           Twirp::Rails::Routes.new(self, services).generate_routes!(namespace, options)
         end
@@ -46,9 +46,17 @@ module Twirp
         @services = services
       end
 
-      def generate_routes!(mount_namespace, options)
+      def generate_routes!(mount_namespace, options={})
         routes.scope options[:scope] || 'twirp' do
-          @services.each do |service_wrapper:, namespace:, context: nil, hooks: []|
+          @services.each do |service_options|
+            service_wrapper = service_options[:service_wrapper]
+            namespace = service_options[:namespace]
+            context = service_options[:context]
+            hooks = service_options[:hooks] || []
+
+            raise ArgumentError.new("service_wrapper must be set before binding a service.") if service_wrapper.nil?
+            raise ArgumentError.new("namespace must be set before binding a service.") if namespace.nil?
+
             next unless mount_namespace.to_sym == namespace
 
             service = service_wrapper.service
@@ -71,8 +79,10 @@ module Twirp
       end
 
       def attach_service_hooks!(service_wrapper, hooks)
-        hooks.each do |hook_klass:, only: [], except: [], options: {}|
-          hook_klass.attach(service_wrapper, only: only, except: except, **options)
+        hooks.each do |hook_options|
+          hook_klass = hook_options[:hook_klass]
+          options = hook_options[:options] || {}
+          hook_klass.attach(service_wrapper, **options)
         end
       end
     end

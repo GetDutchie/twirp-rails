@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'active_support'
+require 'active_support/log_subscriber'
+
 module Twirp
   module Rails
     module Logging
@@ -20,13 +23,13 @@ module Twirp
             **base_log_info(event)
           }
 
-          twirp_call_info[:params] = event.payload[:env][:input].to_h if Twirp::Rails.configuration.logging.log_params
+          twirp_call_info[:params] = event.payload[:env][:input].to_h if Twirp::Rails.application_config.logging.log_params
 
-          if (exception = event.payload[:env][:exception]) && Twirp::Rails.configuration.logging.log_exceptions
+          if (exception = event.payload[:env][:exception]) && Twirp::Rails.application_config.logging.log_exceptions
             twirp_call_info[:exception] = exception
           end
 
-          data = Twirp::Rails.configuration.logging.log_formatter.call(twirp_call_info)
+          data = Twirp::Rails.application_config.logging.log_formatter.call(twirp_call_info)
           logger.info data
         end
 

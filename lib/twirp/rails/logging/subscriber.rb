@@ -18,14 +18,17 @@ module Twirp
         end
 
         def default_log_writer(event)
+          env = event.payload[:env]
+          return if env.nil? # Guard against missing payload
+
           twirp_call_info = {
             **status_info(event),
             **base_log_info(event)
           }
 
-          twirp_call_info[:params] = event.payload[:env][:input].to_h if Twirp::Rails.application_config.logging.log_params
+          twirp_call_info[:params] = env[:input].to_h if Twirp::Rails.application_config.logging.log_params
 
-          if (exception = event.payload[:env][:exception]) && Twirp::Rails.application_config.logging.log_exceptions
+          if (exception = env[:exception]) && Twirp::Rails.application_config.logging.log_exceptions
             twirp_call_info[:exception] = exception
           end
 
@@ -34,10 +37,13 @@ module Twirp
         end
 
         def base_log_info(event)
+          env = event.payload[:env] || {}
+          rack_env = event.payload[:rack_env] || {}
+
           {
-            service: event.payload[:env][:service].try(:full_name),
-            method: event.payload[:env][:rpc_method],
-            path: event.payload[:rack_env]["REQUEST_PATH"],
+            service: env[:service].try(:full_name),
+            method: env[:rpc_method],
+            path: rack_env["REQUEST_PATH"],
             time: Time.current.iso8601,
             duration: event.duration
           }

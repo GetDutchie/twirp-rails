@@ -34,12 +34,14 @@ module Twirp
           # added to the env by the before_route_request hook.
           service_wrapper.before do |rack_env, env|
             env[:service] = service_wrapper.service
+            env[:rack_env] = rack_env # Store for later use in success/error callbacks
           end
 
           service_wrapper.on_error do |twerr, env|
             env[:service] = service_wrapper.service
 
             payload = {
+              rack_env: env[:rack_env],
               twerr: twerr,
               env: env
             }
@@ -48,7 +50,14 @@ module Twirp
           end
 
           service_wrapper.on_success do |env|
-            instrumenter.finish 'instrumenter.twirp', {}
+            env[:service] = service_wrapper.service
+
+            payload = {
+              rack_env: env[:rack_env],
+              env: env
+            }
+
+            instrumenter.finish 'instrumenter.twirp', payload
           end
 
           service_wrapper.exception_raised do |e, env|

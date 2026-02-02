@@ -1,0 +1,80 @@
+name: Publish to JFrog
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ vars.DEFAULT_ACTIONS_RUNNER_IMAGE || 'ubuntu-latest' }}
+    strategy:
+      matrix:
+        ruby-version: ['3.2', '3.3', '3.4']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby ${{ matrix.ruby-version }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+
+      - name: Run tests
+        run: bundle exec rspec
+
+  publish:
+    needs: test
+    runs-on: ${{ vars.DEFAULT_ACTIONS_RUNNER_IMAGE || 'ubuntu-latest' }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Get gem version
+        id: version
+        run: echo "version=$(grep -oE '([0-9]+\.)+[0-9]+' lib/twirp/rails/version.rb)" >> $GITHUB_OUTPUT
+
+      - name: Print version
+        run: echo "twirp-rails version ${{ steps.version.outputs.version }}"
+
+      - name: Build gem
+        run: gem build twirp-rails.gemspec
+
+      - name: Set up JFrog credentials
+        run: |
+          mkdir -p $HOME/.gem
+          touch $HOME/.gem/credentials
+          chmod 0600 $HOME/.gem/credentials
+          curl ${{ vars.JFROG_GEMS_URL }}/api/v1/api_key.yaml \
+            -u ${{ secrets.JFROG_USERNAME }}:${{ secrets.JFROG_PASSWORD }} \
+            > $HOME/.gem/credentials
+
+      - name: Push gem to JFrog
+        run: |
+          gem push twirp-rails-${{ steps.version.outputs.version }}.gem \
+            --host ${{ vars.JFROG_GEMS_URL }}
+
+      - name: Create git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ steps.version.outputs.version }}" -m "Release v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            --title "v${{ steps.version.outputs.version }}" \
+            --generate-notes

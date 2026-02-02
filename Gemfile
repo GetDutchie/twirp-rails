@@ -7,3 +7,6 @@ gemspec
 gem "activesupport", "~> 7.0"
 gem "actionpack", "~> 7.0"
 gem "railties", "~> 7.0"
+
+# Pin google-protobuf to version with build DSL (removed in 3.25+)
+gem "google-protobuf", "~> 3.24.0"
